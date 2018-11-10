@@ -2,10 +2,16 @@
 #define MYCANVAS_HPP
 
 #include "glcanvas.hpp"
+#include <cstdlib>       // rand, srand
 
 void background(cnv::color_t c)
 {
 	cnv::rect_fill(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), c);
+}
+
+unsigned rand_color(int opacity)
+{
+	return cnv::hexcolor(rand()%256, rand()%256, rand()%256, opacity);
 }
 
 void draw_img(cnv::Image &img, int x, int y, float sz, bool opaque = 1)

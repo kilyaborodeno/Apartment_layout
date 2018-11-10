@@ -1,68 +1,124 @@
-#include <iostream>
-#include "mycanvas.hpp"
-#include <ctime>
+#include <iostream>      // cin, cout, ...
+#include <fstream>       // ifstream, ostream
+#include "mycanvas.hpp"  // graphics
+#include <ctime>         // time
+#include <vector>        // vector
 using namespace std;
 using namespace cnv;
 
-int CIRCLE_X = 50, CIRCLE_Y = 50;
+class Piece
+{
+public:
+	string name;
+	double length;
+	double width;
+	double height;
+	int count;
+	bool wall_x;
+	bool wall_y;
+
+//	void rotate()
+//	{
+//
+//	}
+};
+
+vector<Piece> furniture;
+double SCALE;
+
+double max(double a, double b)
+{
+	if (a > b)
+		return a;
+	return b;
+}
+
+ostream& operator<<(ostream& out, const Piece& p)
+{
+	out << "name: " << p.name << endl;
+	out << "length: " << p.length << endl;
+	out << "width: " << p.width << endl;
+	out << "height: " << p.height << endl;
+	out << "count: " << p.count << endl;
+	return out;
+}
 
 void tick(int)
 {
-	if (CIRCLE_X < 300)
-		CIRCLE_X+=2;
-	if (CIRCLE_Y < 300)
-		CIRCLE_Y+=2;
-	if (CIRCLE_X < 300 || CIRCLE_Y < 300)
-		glutTimerFunc(10, tick, 0);
 	glutPostRedisplay();
+}
+
+int pick_of_two(int a, int b)
+{
+	bool r = rand() % 2;
+	return a*r + b*(!r);
+}
+
+int get_x(Piece p)
+{
+	if(p.wall_x)
+		return pick_of_two(0, glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
+
+	return rand()%int(glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
+}
+
+int get_y(Piece p)
+{
+	if(p.wall_y)
+		return pick_of_two(0, glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
+	return rand()%int(glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
 }
 
 void onPaint()
 {
-	background(hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 0, 600, 100, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 100, 600, 200, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 200, 600, 300, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 300, 600, 400, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 400, 600, 500, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	rect_fill(0, 500, 600, 600, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-	color4(0, 0, 0);
+	for (int i = 1; i < furniture.size(); ++i)
+		for (int j = 0; j < furniture[i].count; ++j)
+		{
+			int left_x = get_x(furniture[i]);
+			int top_y = get_y(furniture[i]);
+			int right_x = left_x + SCALE*furniture[i].width;
+			int bottom_y = top_y + SCALE*furniture[i].length;
 
-	Image img("/home/new/bupe/p.png");
-	draw_img(img, 250, 100, 0.16);
+			rect_fill(left_x, top_y, right_x, bottom_y, rand_color(150));
+		}
 
-	position(150, 304);
-	text_out << "BLACK";
-
-	rect_fill(200, 280, 400, 320);
-	circle_fill(CIRCLE_X, 300, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256)); // r g b a
-
-	circle_fill(600-CIRCLE_X, 300, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(600-CIRCLE_X, CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(CIRCLE_X, CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(600-CIRCLE_X, 600-CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(CIRCLE_X, 600-CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(300, 0+CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle_fill(300, 600-CIRCLE_Y, 50, hexcolor(rand() % 256, rand() % 256,  rand() % 256,  rand() % 256));
-
-	circle(300, 300, 50, hexcolor(0, 255, 0));
-
-	color4(255, 255, 255);
-	position(278, 304);
-	text_out << "Hello";
 	glutSwapBuffers();
 }
 
 int main()
 {
+	ifstream file("info.txt");
+	string s;
+	while (file >> s)
+	{
+		if (s[0] == '#')
+			getline(file, s);
+		else
+		{
+			Piece p;
+			p.name = s;
+			file >> p.length;
+			file >> p.width;
+			file >> p.height;
+			file >> p.count;
+			file >> p.wall_x;
+			file >> p.wall_y;
+			furniture.push_back(p);
+		}
+	}
+
+	for (int i; i < furniture.size(); ++i)
+		cout << furniture[i] << endl;
+	
+	const int max_pixels = 1000;
+	const double max_len = max(furniture[0].length, furniture[0].width);
+	SCALE = max_pixels / max_len;
+
+	const int width = SCALE*furniture[0].width;
+	const int length = SCALE*furniture[0].length;
+
 	srand(time(0));
-	window(600, 600);
+	window(width, length);
 	glutDisplayFunc(onPaint);
 	tick(0);
 	glutMainLoop();
