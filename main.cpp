@@ -1,93 +1,25 @@
 #include <iostream>      // cin, cout, ...
 #include <fstream>       // ifstream, ostream
 #include "mycanvas.hpp"  // graphics
+#include "mylib.hpp"     // Some special functions
 #include <ctime>         // time
 #include <vector>        // vector
+
 using namespace std;
 using namespace cnv;
 
-class Piece
-{
-public:
-	string name;
-	double length;
-	double width;
-	double height;
-	int count;
-	bool wall_x;
-	bool wall_y;
-
-//	void rotate()
-//	{
-//
-//	}
-};
-
 vector<Piece> furniture;
 double SCALE;
+int width, height;
 
-double max(double a, double b)
-{
-	if (a > b)
-		return a;
-	return b;
-}
-
-ostream& operator<<(ostream& out, const Piece& p)
-{
-	out << "name: " << p.name << endl;
-	out << "length: " << p.length << endl;
-	out << "width: " << p.width << endl;
-	out << "height: " << p.height << endl;
-	out << "count: " << p.count << endl;
-	return out;
-}
-
-void tick(int)
-{
-	glutPostRedisplay();
-}
-
-int pick_of_two(int a, int b)
-{
-	bool r = rand() % 2;
-	return a*r + b*(!r);
-}
-
-int get_x(Piece p)
-{
-	if(p.wall_x)
-		return pick_of_two(0, glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
-
-	return rand()%int(glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
-}
-
-int get_y(Piece p)
-{
-	if(p.wall_y)
-		return pick_of_two(0, glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
-	return rand()%int(glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
-}
-
-void onPaint()
-{
-	for (int i = 1; i < furniture.size(); ++i)
-		for (int j = 0; j < furniture[i].count; ++j)
-		{
-			int left_x = get_x(furniture[i]);
-			int top_y = get_y(furniture[i]);
-			int right_x = left_x + SCALE*furniture[i].width;
-			int bottom_y = top_y + SCALE*furniture[i].length;
-
-			rect_fill(left_x, top_y, right_x, bottom_y, rand_color(150));
-		}
-
-	glutSwapBuffers();
-}
+void onPaint(void);
+void reshape(int w, int h);
+void tick(int);
 
 int main()
 {
-	ifstream file("info.txt");
+    setlocale(LC_ALL, "rus");
+	ifstream file("C:/Users/bav73/Работа с исходным кодом/Проект/First version/info.txt");
 	string s;
 	while (file >> s)
 	{
@@ -107,19 +39,76 @@ int main()
 		}
 	}
 
-	for (int i; i < furniture.size(); ++i)
+	for (int i = 0; i < furniture.size(); ++i)
 		cout << furniture[i] << endl;
-	
+
 	const int max_pixels = 1000;
 	const double max_len = max(furniture[0].length, furniture[0].width);
 	SCALE = max_pixels / max_len;
 
-	const int width = SCALE*furniture[0].width;
-	const int length = SCALE*furniture[0].length;
+	const int wid = SCALE*furniture[0].width;
+	const int len = SCALE*furniture[0].length;
+
+    width = max(wid, len);
+    height = min(len, wid);
 
 	srand(time(0));
-	window(width, length);
+	window(wid, len, "Apartment layout");
 	glutDisplayFunc(onPaint);
-	tick(0);
+	glutReshapeFunc(reshape);
+	glutTimerFunc(1,tick,1);
 	glutMainLoop();
+}
+
+void tick(int)
+{
+	glutPostRedisplay();
+}
+
+int get_x(Piece p)
+{
+	if(p.wall_x)
+		return pick_of_two(0, glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
+
+	return rand()%int(glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
+}
+
+int get_y(Piece p)
+{
+	if(p.wall_y)
+		return pick_of_two(0, glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
+	return rand()%int(glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
+}
+
+void onPaint()
+{
+    clear(255,255,255);
+	for (int i = 1; i < furniture.size(); ++i)
+		for (int j = 0; j < furniture[i].count; ++j)
+		{
+			int left_x = get_x(furniture[i]);
+			int top_y = get_y(furniture[i]);
+			int right_x = left_x + SCALE*furniture[i].width;
+			int bottom_y = top_y + SCALE*furniture[i].length;
+
+			rect_fill(left_x, top_y, right_x, bottom_y, rand_color(150));
+		}
+
+	glutSwapBuffers();
+}
+
+void reshape (int w, int h)
+{
+  double scale = min(double(w)/width, double(h)/height);
+  width *= scale;
+  height *= scale;
+  int x = max((w - width)/2, 0);
+  int y = max((h - height)/2, 0);
+  glViewport (x, y, width, height);
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D (0, width, height, 0);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity();
+  glutPostRedisplay();
 }
