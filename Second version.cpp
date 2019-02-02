@@ -19,7 +19,9 @@ void tick(int);
 int main()
 {
     setlocale(LC_ALL, "rus");
-	ifstream file("C:/Users/bav73/Работа с исходным кодом/Проект/First version/info.txt");
+    srand(time(0));
+
+	ifstream file("info.txt");
 	string s;
 	while (file >> s)
 	{
@@ -52,7 +54,6 @@ int main()
     width = max(wid, len);
     height = min(len, wid);
 
-	srand(time(0));
 	window(wid, len, "Apartment layout");
 	glutDisplayFunc(onPaint);
 	glutReshapeFunc(reshape);
@@ -83,7 +84,12 @@ int get_y(Piece p)
 void onPaint()
 {
     clear(255,255,255);
-	for (int i = 1; i < furniture.size(); ++i)
+	for (int i = 1; i < furniture.size(); ++i){
+        if(furniture[i].wall_x || furniture[i].wall_y)
+        {
+            furniture[i].rotate_to_wall();
+            furniture[i].rotate();
+        }
 		for (int j = 0; j < furniture[i].count; ++j)
 		{
 			int left_x = get_x(furniture[i]);
@@ -93,10 +99,12 @@ void onPaint()
 
 			rect_fill(left_x, top_y, right_x, bottom_y, rand_color(150));
 		}
+	}
 
 	glutSwapBuffers();
 }
 
+// Not correct yet
 void reshape (int w, int h)
 {
   double scale = min(double(w)/width, double(h)/height);
@@ -110,5 +118,5 @@ void reshape (int w, int h)
   gluOrtho2D (0, width, height, 0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
-  glutPostRedisplay();
+  //glutPostRedisplay();
 }
