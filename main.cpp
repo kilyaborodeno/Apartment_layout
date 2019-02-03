@@ -1,6 +1,7 @@
 #include <iostream>      // cin, cout, ...
 #include <fstream>       // ifstream, ostream
 #include "mycanvas.hpp"  // graphics
+#include "piece.hpp"  // graphics
 #include "mylib.hpp"     // Some special functions
 #include <ctime>         // time
 #include <vector>        // vector
@@ -10,18 +11,32 @@ using namespace cnv;
 
 vector<Piece> furniture;
 double SCALE;
-int width, height;
+double WIDTH, HEIGHT;
 
 void onPaint(void);
 void reshape(int w, int h);
 void tick(int);
+void load();
 
 int main()
 {
     setlocale(LC_ALL, "rus");
-	ifstream file("C:/Users/bav73/Работа с исходным кодом/Проект/First version/info.txt");
+    srand(time(0));
+	load();
+
+	window(WIDTH, HEIGHT);
+	glutSetWindowTitle("Apartment layout");
+	glutDisplayFunc(onPaint);
+	glutReshapeFunc(reshape);
+	glutTimerFunc(1,tick,1);
+	glutMainLoop();
+}
+
+void load()
+{
+	ifstream file("info.txt");
 	string s;
-	while (file >> s)
+	while(file >> s)
 	{
 		if (s[0] == '#')
 			getline(file, s);
@@ -29,35 +44,35 @@ int main()
 		{
 			Piece p;
 			p.name = s;
+			int count;
 			file >> p.length;
 			file >> p.width;
 			file >> p.height;
-			file >> p.count;
+			file >> count;
 			file >> p.wall_x;
 			file >> p.wall_y;
-			furniture.push_back(p);
+			cout << p << endl;
+			if (!furniture.size())
+			{
+				const int max_pixels = 1000;
+				const double max_len = max(p.length, p.width);
+				SCALE = max_pixels / max_len;
+				WIDTH = SCALE*p.width;
+				HEIGHT = SCALE*p.length;
+				furniture.push_back(p);
+			}
+			else if ((p.length > furniture[0].length && p.length > furniture[0].width) ||
+				   	(p.width > furniture[0].width && p.width > furniture[0].length) ||
+				   	p.height > furniture[0].height)
+				cout << "РџСЂРµРґРјРµС‚ СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№" << endl;
+			else
+				for (int i = 0; i < count; ++i)
+				{
+					p.gen_coords(WIDTH/SCALE, HEIGHT/SCALE);
+					furniture.push_back(p);
+				}
 		}
 	}
-
-	for (int i = 0; i < furniture.size(); ++i)
-		cout << furniture[i] << endl;
-
-	const int max_pixels = 1000;
-	const double max_len = max(furniture[0].length, furniture[0].width);
-	SCALE = max_pixels / max_len;
-
-	const int wid = SCALE*furniture[0].width;
-	const int len = SCALE*furniture[0].length;
-
-    width = max(wid, len);
-    height = min(len, wid);
-
-	srand(time(0));
-	window(wid, len, "Apartment layout");
-	glutDisplayFunc(onPaint);
-	glutReshapeFunc(reshape);
-	glutTimerFunc(1,tick,1);
-	glutMainLoop();
 }
 
 void tick(int)
@@ -65,49 +80,32 @@ void tick(int)
 	glutPostRedisplay();
 }
 
-int get_x(Piece p)
-{
-	if(p.wall_x)
-		return pick_of_two(0, glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
-
-	return rand()%int(glutGet(GLUT_WINDOW_WIDTH) - SCALE*p.width);
-}
-
-int get_y(Piece p)
-{
-	if(p.wall_y)
-		return pick_of_two(0, glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
-	return rand()%int(glutGet(GLUT_WINDOW_HEIGHT) - SCALE*p.length);
-}
-
 void onPaint()
 {
     clear(255,255,255);
+	glLineWidth(3);
+	rect(0, 0, WIDTH, HEIGHT);
 	for (int i = 1; i < furniture.size(); ++i)
-		for (int j = 0; j < furniture[i].count; ++j)
-		{
-			int left_x = get_x(furniture[i]);
-			int top_y = get_y(furniture[i]);
-			int right_x = left_x + SCALE*furniture[i].width;
-			int bottom_y = top_y + SCALE*furniture[i].length;
-
-			rect_fill(left_x, top_y, right_x, bottom_y, rand_color(150));
-		}
+		rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
+                  furniture[i].x*SCALE+furniture[i].width*SCALE,
+				  furniture[i].y*SCALE+furniture[i].length*SCALE,
+				  furniture[i].color);
 
 	glutSwapBuffers();
 }
 
 void reshape (int w, int h)
 {
-  double scale = min(double(w)/width, double(h)/height);
-  width *= scale;
-  height *= scale;
-  int x = max((w - width)/2, 0);
-  int y = max((h - height)/2, 0);
-  glViewport (x, y, width, height);
+  double scale = min(double(w)/WIDTH, double(h)/HEIGHT);
+  WIDTH *= scale;
+  HEIGHT *= scale;
+  SCALE *= scale;
+  int x = max((w - WIDTH)/2, 0);
+  int y = max((h - HEIGHT)/2, 0);
+  glViewport (x, y, WIDTH, HEIGHT);
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D (0, width, height, 0);
+  gluOrtho2D (0, WIDTH, HEIGHT, 0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
   glutPostRedisplay();

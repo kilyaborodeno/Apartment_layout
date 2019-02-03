@@ -14,10 +14,10 @@ unsigned rand_color(int opacity)
 	return cnv::hexcolor(rand()%256, rand()%256, rand()%256, opacity);
 }
 
-void draw_img(cnv::Image &img, int x, int y, float sz, bool opaque = 1)
+void draw_img(cnv::Image &img, int x, int y, double sz, bool opaque = 1)
 {
-	float cc[4];
-	glGetFloatv(GL_CURRENT_COLOR, cc);
+	double cc[4];
+	glGetDoublev(GL_CURRENT_COLOR, cc);
 
 	if (opaque)
 		cnv::color4(255, 255, 255);
