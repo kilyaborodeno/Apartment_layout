@@ -1,0 +1,4 @@
+*.out
+*.exe
+Session.vim
+test.cpp

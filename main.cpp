@@ -1,7 +1,7 @@
 #include <iostream>      // cin, cout, ...
 #include <fstream>       // ifstream, ostream
 #include "mycanvas.hpp"  // graphics
-#include "piece.hpp"  // graphics
+#include "piece.hpp"     // room objects
 #include "mylib.hpp"     // Some special functions
 #include <ctime>         // time
 #include <vector>        // vector
@@ -17,6 +17,7 @@ void onPaint(void);
 void reshape(int w, int h);
 void tick(int);
 void load();
+void keyboard(unsigned char key, int mx, int my);
 
 int main()
 {
@@ -29,8 +30,11 @@ int main()
 	glutDisplayFunc(onPaint);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(1,tick,1);
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 }
+
+vector<Rects> rects = create(WIDTH, HEIGHT);
 
 void load()
 {
@@ -82,9 +86,8 @@ void tick(int)
 
 void onPaint()
 {
-    clear(255,255,255);
-	glLineWidth(3);
-	rect(0, 0, WIDTH, HEIGHT);
+    clear(0,0,0);
+	rect_fill(0, 0, WIDTH, HEIGHT, hexcolor(255,255,255));
 	for (int i = 1; i < furniture.size(); ++i)
 		rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
                   furniture[i].x*SCALE+furniture[i].width*SCALE,
@@ -109,4 +112,14 @@ void reshape (int w, int h)
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
   glutPostRedisplay();
+}
+
+void keyboard(unsigned char key, int mx, int my)
+{
+	if(key == 27)
+		exit(0);
+	if(key == 'r' || key == 'R')
+		for(int i = 0; i < furniture.size(); ++i)
+			furniture[i].gen_coords(furniture[0].width, furniture[0].length);
+	glutPostRedisplay();
 }
