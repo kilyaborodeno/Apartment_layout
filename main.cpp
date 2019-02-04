@@ -34,7 +34,7 @@ int main()
 	glutMainLoop();
 }
 
-vector<Rects> rects = create(WIDTH, HEIGHT);
+Rects rects = create(WIDTH, HEIGHT);
 
 void load()
 {
@@ -68,15 +68,31 @@ void load()
 			else if ((p.length > furniture[0].length && p.length > furniture[0].width) ||
 				   	(p.width > furniture[0].width && p.width > furniture[0].length) ||
 				   	p.height > furniture[0].height)
-				cout << "ÐŸÑ€ÐµÐ´Ð¼ÐµÑ‚ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¹" << endl;
+				cout << "Ïðåäìåò ñëèøêîì áîëüøîé" << endl;
 			else
 				for (int i = 0; i < count; ++i)
 				{
-					p.gen_coords(WIDTH/SCALE, HEIGHT/SCALE);
 					furniture.push_back(p);
 				}
 		}
 	}
+}
+
+void place_objects()
+{
+    for(int i = 1; i < furniture.size(); ++i)
+    {
+        furniture[i].choose_rect(rects);
+        furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinate int chosen rectangle
+        int x1 = furniture[i].x;
+        int y1 = furniture[i].y;
+        int x2 = x1+furniture[i].width;
+        int y2 = y1+furniture[i].length;
+        //rects.num[furniture[i].current_rect].erase(rects.num.begin() + current_rect);
+        furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
+//        current_rect = 0;
+        rects.merge();
+    }
 }
 
 void tick(int)
@@ -118,8 +134,8 @@ void keyboard(unsigned char key, int mx, int my)
 {
 	if(key == 27)
 		exit(0);
-	if(key == 'r' || key == 'R')
-		for(int i = 0; i < furniture.size(); ++i)
-			furniture[i].gen_coords(furniture[0].width, furniture[0].length);
+	if(key == 'r' || key == 'R');
+//		for(int i = 0; i < furniture.size(); ++i)
+//			furniture[i].gen_coords(furniture[0].width, furniture[0].length);
 	glutPostRedisplay();
 }

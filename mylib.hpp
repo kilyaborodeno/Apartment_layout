@@ -4,6 +4,8 @@
 #include <cstdlib>       // rand, srand
 #include <vector>
 
+using namespace std;
+
 int pick_of_two(int a, int b)
 {
 	bool r = rand() % 2;
@@ -17,27 +19,32 @@ double max(double a, double b)
 	return b;
 }
 
-struct Retcs
+bool sides_at_wall(int x1, int y1, int x2, int y2, int X1, int Y1, int X2, int Y2)
 {
-	int x1, y1;
-	int x2, y2;
+    bool sides = false;
+    if(x1 == X1)
+        sides = true;
+    if(y1 == Y1)
+        sides = true;
+    if(y2 == Y2)
+        sides = true;
+    if(x2 == X2)
+        sides = true;
+    return sides;
 }
 
-vector<Rects> create(int w, int h)
+int which_sides_free(int x1, int y1, int x2, int y2, int X1, int Y1, int X2, int Y2)
 {
-	vector<Rects> rects;
-	Rects r;
-	r.x1 = 0;
-	r.y1 = 0;
-	r.x2 = w;
-	r.y2 = h;
-	rects.push_back(r);
-	return rects;
-}
-
-void create_rects(int x, int y, int width, int length)
-{	
-	
+    int sides = 0;
+    if(x1 != X1)
+        sides *= 10 + 1; // left
+    if(y1 != Y1)
+        sides *= 10 + 2; // upper
+    if(y2 != Y2)
+        sides *= 10 + 4; // right
+    if(x2 != X2)
+        sides *= 10 + 3; // lower
+    return sides;                   // side
 }
 
 #endif // MYLIB_HPP
