@@ -86,7 +86,7 @@ public:
 					continue;
 				proper_rects.push_back(i);
 			}
-			if(proper_rects.size())) // choosing one of proper rectangles
+			if(proper_rects.size()) // choosing one of proper rectangles
             {
                 int choise = rand()%proper_rects.size();
                 current_rect = proper_rects[choise];
