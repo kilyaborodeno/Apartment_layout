@@ -10,6 +10,7 @@ using namespace std;
 using namespace cnv;
 
 vector<Piece> furniture;
+Rects rects;
 double SCALE;
 double WIDTH, HEIGHT;
 
@@ -18,12 +19,15 @@ void reshape(int w, int h);
 void tick(int);
 void load();
 void keyboard(unsigned char key, int mx, int my);
+void place_objects();
 
 int main()
 {
     setlocale(LC_ALL, "rus");
     srand(time(0));
 	load();
+	rects = create(WIDTH/SCALE, HEIGHT/SCALE);
+	place_objects();
 
 	window(WIDTH, HEIGHT);
 	glutSetWindowTitle("Apartment layout");
@@ -33,8 +37,6 @@ int main()
 	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 }
-
-Rects rects = create(WIDTH, HEIGHT);
 
 void load()
 {
@@ -80,18 +82,25 @@ void load()
 
 void place_objects()
 {
-    for(int i = 1; i < furniture.size(); ++i)
+    cout <<  furniture.size() << endl;
+    cout << rects.num.size() << endl;
+    for(int i = 0; i < rects.num.size(); ++i)
+        cout << endl << rects.num[i];
+    for(size_t i = 1; i < furniture.size(); ++i)
     {
         furniture[i].choose_rect(rects);
+        cout << furniture[i].current_rect << endl;
         furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinate int chosen rectangle
         int x1 = furniture[i].x;
         int y1 = furniture[i].y;
         int x2 = x1+furniture[i].width;
         int y2 = y1+furniture[i].length;
+        cout << i << endl << x1 << ' ' << y1 << ' ' << x2 << ' ' << y2 << endl;
         //rects.num[furniture[i].current_rect].erase(rects.num.begin() + current_rect);
-        furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
+        //furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
 //        current_rect = 0;
-        rects.merge();
+        //rects.merge();
+
     }
 }
 
@@ -104,11 +113,16 @@ void onPaint()
 {
     clear(0,0,0);
 	rect_fill(0, 0, WIDTH, HEIGHT, hexcolor(255,255,255));
-	for (int i = 1; i < furniture.size(); ++i)
+	int i;
+	for(i = 1; i < furniture.size(); ++i)
 		rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
                   furniture[i].x*SCALE+furniture[i].width*SCALE,
 				  furniture[i].y*SCALE+furniture[i].length*SCALE,
 				  furniture[i].color);
+    cout << furniture[i].x*SCALE << ' ' << furniture[i].y*SCALE << ' ' <<
+                  furniture[i].x*SCALE+furniture[i].width*SCALE << ' ' <<
+				  furniture[i].y*SCALE+furniture[i].length*SCALE << ' ' <<
+				  endl;
 
 	glutSwapBuffers();
 }

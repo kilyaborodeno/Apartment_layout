@@ -33,7 +33,7 @@ public:
         }
 	}
 
-	void choose_rect(Rects& rects)
+	void choose_rect(Rects rects)
 	{
 		if(wall_x)
 		{
@@ -43,7 +43,7 @@ public:
 				if(!rects.num[rects_at_wall[i]].fits(width, length) || rects.num[rects_at_wall[i]].chosen == true)
 					rects_at_wall.erase(rects_at_wall.begin() + i);
 			}
-			if(!rects_at_wall.size()) // choosing one of proper rectangles
+			if(rects_at_wall.size()) // choosing one of proper rectangles
             {
                 int choise = rand()%rects_at_wall.size();
                 current_rect = rects_at_wall[choise];
@@ -55,12 +55,12 @@ public:
 		{
 
 			vector<int> rects_at_wall = rects.count_rects_at_wall_y();// all rectangle numbers at wall_y
-			for(int i = 0; i < rects_at_wall.size(); ++i) // deleting inappropriate rectangle numbers
+			for(size_t i = 0; i < rects_at_wall.size(); ++i) // deleting inappropriate rectangle numbers
 			{
 				if(!rects.num[rects_at_wall[i]].fits(width, length) || rects.num[rects_at_wall[i]].chosen == true)
 					rects_at_wall.erase(rects_at_wall.begin() + i);
 			}
-			if(!rects_at_wall.size()) // choosing one of proper rectangles
+			if(rects_at_wall.size()) // choosing one of proper rectangles
             {
                 int choise = rand()%rects_at_wall.size();
                 current_rect = rects_at_wall[choise];
@@ -71,15 +71,15 @@ public:
 		else
 		{
 			int w = 0;
-			for(int i = 0; i < rects.num.size(); ++i) // calculating the width of the room
+			for(size_t i = 0; i < rects.num.size(); ++i) // calculating the width of the room
 				if(rects.num[i].x2 > w)
 					w = rects.num[i].x2;
 			int l = 0;
-			for(int i = 0; i < rects.num.size(); ++i) // calculating the length of the room
+			for(size_t i = 0; i < rects.num.size(); ++i) // calculating the length of the room
 				if(rects.num[i].y2 > l)
 					l = rects.num[i].x2;
 			vector<int> proper_rects;
-			for(int i = 0; i < rects.num.size(); ++i) // creating an array with proper rectangles
+			for(size_t i = 0; i < rects.num.size(); ++i) // creating an array with proper rectangles
 			{
 				if(rects.num[i].x1 == 0 || rects.num[i].y1 == 0 ||
                    rects.num[i].x2 == w || rects.num[i].y2 == l || rects.num[i].chosen == true)
@@ -99,9 +99,9 @@ public:
     // when generating coordinate the rectangle always fits the room
 	void gen_coords(Rect r)
 	{
-		if(width > r.x2 - r.x1) rotate(); // rotating the object to fit in by width and length
-		if(length > r.y2 - r.y1) rotate();
-		rotate_to_wall();
+        rotate_to_wall();
+		if(wall_y && width > r.x2 - r.x1) rotate(); // rotating the object to fit in by width and length
+		if(wall_x && length > r.y2 - r.y1) rotate();
 
 		int free_w = r.x2 - r.x1 - width; // calculating the coordinates range
 		int free_h = r.y2 - r.y1 - length;

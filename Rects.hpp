@@ -29,10 +29,10 @@ public:
 	{
 		vector<int> rects_at_wall;
 		int w = 0;
-		for(int i = 0; i < num.size(); ++i) // calculating the width of the room
+		for(size_t i = 0; i < num.size(); ++i) // calculating the width of the room
 			if(num[i].x2 > w)
 				w = num[i].x2;
-		for(int i = 0; i < num.size(); ++i) // calculating the number of rectangles leaning on wall_x
+		for(size_t i = 0; i < num.size(); ++i) // calculating the number of rectangles leaning on wall_x
         {
 			if(num[i].x1 == 0 || num[i].x2 == w)
 				rects_at_wall.push_back(i);
@@ -44,10 +44,10 @@ public:
 	{
 		vector<int> rects_at_wall;
 		int len = 0;
-		for(int i = 0; i < num.size(); ++i) // calculating the length of the room
+		for(size_t i = 0; i < num.size(); ++i) // calculating the length of the room
 			if(num[i].y2 > len)
 				len = num[i].x2;
-		for(int i = 0; i < num.size(); ++i) // calculating the number of rectangles leaning on wall_y
+		for(size_t i = 0; i < num.size(); ++i) // calculating the number of rectangles leaning on wall_y
         {
 			if(num[i].y1 == 0 || num[i].y2 == len)
 				rects_at_wall.push_back(i);
@@ -130,6 +130,15 @@ Rects create(int w, int h)
     r.y2 = h;
     rects.num.push_back(r);
 	return rects;
+}
+
+ostream& operator<<(ostream& out, const Rect r)
+{
+	out << "x1: " << r.x1 << endl;
+	out << "y1: " << r.y1 << endl;
+	out << "x2: " << r.x2 << endl;
+	out << "y2: " << r.y2 << endl;
+	return out;
 }
 
 #endif // RECTS_HPP
