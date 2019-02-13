@@ -1,7 +1,7 @@
 #include <iostream>      // cin, cout, ...
 #include <fstream>       // ifstream, ostream
 #include "mycanvas.hpp"  // graphics
-#include "piece.hpp"     // room objects
+#include "Piece.hpp"     // room objects
 #include "mylib.hpp"     // Some special functions
 #include <ctime>         // time
 #include <vector>        // vector
@@ -70,7 +70,7 @@ void load()
 			else if ((p.length > furniture[0].length && p.length > furniture[0].width) ||
 				   	(p.width > furniture[0].width && p.width > furniture[0].length) ||
 				   	p.height > furniture[0].height)
-				cout << "Предмет слишком большой" << endl;
+				cout << "??????? ??????? ???????" << endl;
 			else
 				for (int i = 0; i < count; ++i)
 				{
@@ -82,25 +82,21 @@ void load()
 
 void place_objects()
 {
-    cout <<  furniture.size() << endl;
-    cout << rects.num.size() << endl;
-    for(int i = 0; i < rects.num.size(); ++i)
-        cout << endl << rects.num[i];
     for(size_t i = 1; i < furniture.size(); ++i)
     {
         furniture[i].choose_rect(rects);
-        cout << furniture[i].current_rect << endl;
-        furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinate int chosen rectangle
+        furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
         int x1 = furniture[i].x;
         int y1 = furniture[i].y;
         int x2 = x1+furniture[i].width;
         int y2 = y1+furniture[i].length;
-        cout << i << endl << x1 << ' ' << y1 << ' ' << x2 << ' ' << y2 << endl;
-        //rects.num[furniture[i].current_rect].erase(rects.num.begin() + current_rect);
-        //furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
-//        current_rect = 0;
-        //rects.merge();
-
+        furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
+		rects.num[furniture[i].current_rect].chosen = true;
+        rects.merge_all();
+		/*
+		for (int j = 0; j < rects.num.size(); ++j)
+			cout << rects.num[j] << endl;
+			*/
     }
 }
 
@@ -119,11 +115,6 @@ void onPaint()
                   furniture[i].x*SCALE+furniture[i].width*SCALE,
 				  furniture[i].y*SCALE+furniture[i].length*SCALE,
 				  furniture[i].color);
-    cout << furniture[i].x*SCALE << ' ' << furniture[i].y*SCALE << ' ' <<
-                  furniture[i].x*SCALE+furniture[i].width*SCALE << ' ' <<
-				  furniture[i].y*SCALE+furniture[i].length*SCALE << ' ' <<
-				  endl;
-
 	glutSwapBuffers();
 }
 
@@ -148,8 +139,7 @@ void keyboard(unsigned char key, int mx, int my)
 {
 	if(key == 27)
 		exit(0);
-	if(key == 'r' || key == 'R');
-//		for(int i = 0; i < furniture.size(); ++i)
-//			furniture[i].gen_coords(furniture[0].width, furniture[0].length);
+	if(key == 'r' || key == 'R')
+		place_objects();
 	glutPostRedisplay();
 }

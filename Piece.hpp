@@ -53,7 +53,6 @@ public:
 		}
 		else if(wall_y)
 		{
-
 			vector<int> rects_at_wall = rects.count_rects_at_wall_y();// all rectangle numbers at wall_y
 			for(size_t i = 0; i < rects_at_wall.size(); ++i) // deleting inappropriate rectangle numbers
 			{
@@ -96,7 +95,7 @@ public:
 		}
 	}
 
-    // when generating coordinate the rectangle always fits the room
+    // when generating coordinates the rectangle always fits the room
 	void gen_coords(Rect r)
 	{
         rotate_to_wall();
