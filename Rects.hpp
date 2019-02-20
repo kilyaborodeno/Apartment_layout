@@ -12,6 +12,11 @@ struct Rect
 	int x2, y2;
 	bool chosen; // if the rectangle is taken
 
+	Rect()
+	{
+	    chosen = false;
+	}
+
 	bool fits(int width, int length)
 	{
 		if((x2 - x1 < width)||(y2 - y1 < width)) // also checking if the object can be rotated and fit in rectangle
@@ -27,7 +32,7 @@ ostream& operator<<(ostream& out, const Rect r)
 	out << "y1: " << r.y1 << endl;
 	out << "x2: " << r.x2 << endl;
 	out << "y2: " << r.y2 << endl;
-	out << "chosen: " << r.chosen << endl;
+	out << "chosen: " << std::string(r.chosen ? "true" : "false") << endl;
 	return out;
 }
 
@@ -78,67 +83,68 @@ public:
         int x2 = num[number].x2;
         int y2 = num[number].y2;
 
+///////////
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 4)
 			return number;
 
-		int s = which_sides_free(x1, y1, x2, y2, X1, Y1, X2, Y2);
+		int s = which_sides(x1, y1, x2, y2, X1, Y1, X2, Y2);
 		if(num.size() != 1) num.erase(num.begin() + number);// deleting a sliced rectangle from an array
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 3)
 		{
-			Rect r1, r2;
-			r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; // Calculating the coordinates of two new rectangles
+			Rect r[2];
+			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of two new rectangles
+            r[1].chosen = false;
 			switch(s)
 			{
-				case 1: r2.x1 = x1; r2.y1 = y1; r2.x2 = X1; r2.y2 = y2; break;
-				case 2: r2.x1 = x1; r2.y1 = y1; r2.x2 = x2; r2.y2 = Y1; break;
-				case 3: r2.x1 = X1; r2.y1 = y1; r2.x2 = x2; r2.y2 = y2; break;
-				case 4: r2.x1 = x1; r2.y1 = Y1; r2.x2 = X1; r2.y2 = y2; break;
+				case 123: r[1].x1 = x1; r[1].y1 = Y2; r[1].x2 = x2; r[1].y2 = y2; break;
+				case 234: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X1; r[1].y2 = y2; break;
+				case 134: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = x2; r[1].y2 = Y1; break;
+				case 124: r[1].x1 = X2; r[1].y1 = y1; r[1].x2 = x2; r[1].y2 = y2; break;
 			}
-			num.push_back(r1);// adding two new rectangles to an array
-			num.push_back(r2);
-			return num.size()-2;// returning new current rectangle number to make it chosen
+			for(size_t i = 0; i < 2; ++i)   // adding two new rectangles to an array
+                num.push_back(r[i]);
+			return num.size()-2;    // returning new current rectangle number to make it chosen
 		}
+///////////
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 2)
 		{
-			Rect r1, r2, r3, r4;
-			r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; // Calculating the coordinates of four new rectangles
+			Rect r[4];
+			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of four new rectangles
+			for(size_t i = 1; i < 4; ++i) r[i].chosen = false;
 			switch(s)
 			{
-				case 14: r2.x1 = x1; r2.y1 = Y2; r2.x2 = X2; r2.y2 = y2;
-						 r3.x1 = X2; r3.y1 = Y2; r3.x2 = x2; r3.y2 = y2;
-						 r4.x1 = X2; r4.y1 = Y1; r4.x2 = X2; r4.y2 = y2;
-						 cout << r2.x1 << ' ' << r2.y1 << ' ' << r2.x2 << ' ' << r2.y2 << endl;
+				case 12: r[1].x1 = x1; r[1].y1 = Y2; r[1].x2 = X2; r[1].y2 = y2;
+						 r[2].x1 = X2; r[2].y1 = Y2; r[2].x2 = x2; r[2].y2 = y2;
+						 r[3].x1 = X2; r[3].y1 = y1; r[3].x2 = x2; r[3].y2 = Y2;
 				break;
-				case 34: r2.x1 = x1; r2.y1 = y1; r2.x2 = X1; r2.y2 = Y2;
-						 r3.x1 = x1; r3.y1 = Y2; r3.x2 = X1; r3.y2 = y2;
-						 r4.x1 = X1; r4.y1 = Y1; r4.x2 = x2; r4.y2 = y2;
-						 cout << r2.x1 << ' ' << r2.y1 << ' ' << r2.x2 << ' ' << r2.y2 << endl;
+				case 23: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X1; r[1].y2 = Y2;
+						 r[2].x1 = x1; r[2].y1 = Y2; r[2].x2 = X1; r[2].y2 = y2;
+						 r[3].x1 = X1; r[3].y1 = Y2; r[3].x2 = x2; r[3].y2 = y2;
 				break;
-				case 23: r2.x1 = x1; r2.y1 = Y1; r2.x2 = X1; r2.y2 = y2;
-						 r3.x1 = x1; r3.y1 = y1; r3.x2 = X1; r3.y2 = Y1;
-						 r4.x1 = X1; r4.y1 = y1; r4.x2 = x2; r4.y2 = Y1;
-						 cout << r2.x1 << ' ' << r2.y1 << ' ' << r2.x2 << ' ' << r2.y2 << endl;
+				case 34: r[1].x1 = x1; r[1].y1 = Y1; r[1].x2 = X1; r[1].y2 = y2;
+						 r[2].x1 = x1; r[2].y1 = y1; r[2].x2 = X1; r[2].y2 = Y1;
+						 r[3].x1 = X1; r[3].y1 = y1; r[3].x2 = x2; r[3].y2 = Y1;
 				break;
-				case 12: r2.x1 = x1; r2.y1 = y1; r2.x2 = X2; r2.y2 = Y2;
-						 r3.x1 = X2; r3.y1 = y1; r3.x2 = x2; r3.y2 = Y1;
-						 r4.x1 = X2; r4.y1 = Y1; r4.x2 = x2; r4.y2 = y2;
-						 cout << r2.x1 << ' ' << r2.y1 << ' ' << r2.x2 << ' ' << r2.y2 << endl;
+				case 14: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X2; r[1].y2 = Y1;
+						 r[2].x1 = X2; r[2].y1 = y1; r[2].x2 = x2; r[2].y2 = Y1;
+						 r[3].x1 = X2; r[3].y1 = Y1; r[3].x2 = x2; r[3].y2 = y2;
 				break;
 			}
-			num.push_back(r1);// adding four new rectangles to an array
-			num.push_back(r2);
-			num.push_back(r3);
-			num.push_back(r4);
-			cout << r1 << r2 << r3 << r4 << endl;
+			for(size_t i = 0; i < 4; ++i)// adding four new rectangles to an array
+            {
+                num.push_back(r[i]);
+            }
 			return num.size()-4;// returning new current rectangle number to make a it chosen
 		}
+///////////
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 1)
 		{
 			Rect r1, r2, r3, r4, r5, r6;
-			r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; // Calculating the coordinates of six new rectangles
+			r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; r[0].chosen = true; // Calculating the coordinates of six new rectangles
+			for(size_t i = 1; i < 6; ++i) r[i].chosen = false;
 			switch(s)
 			{
 				case 234: r2.x1 = x1; r2.y1 = y1; r2.x2 = X2; r2.y2 = Y1;
@@ -166,18 +172,15 @@ public:
 						  r6.x1 = X2; r6.y1 = Y1; r6.x2 = x2; r6.y2 = y2;
 				break;
 			}
-			num.push_back(r1);// adding six new rectangles to an array
-			num.push_back(r2);
-			num.push_back(r3);
-			num.push_back(r4);
-			num.push_back(r5);
-			num.push_back(r6);
+			for(suze_t i = 0; i < 6 ++i) // adding six new rectangles to an array
+                num.push_back(r[i]);
 			return num.size()-6;// returning new current rectangle number to make it chosen
 		}
 
 		// sides_at_wall == 0
 		Rect r1, r2, r3, r4, r5, r6, r7, r8, r9;
-		r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; // Calculating the coordinates of six new rectangles
+        for(size_t i = 1; i < 9; ++i) r[i].chosen = false;
+		r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of nine new rectangles
 		r2.x1 = x1; r2.y1 = y1; r2.x2 = X1; r2.y2 = Y1;
 		r3.x1 = X1; r3.y1 = y1; r3.x2 = X2; r3.y2 = Y1;
 		r4.x1 = X2; r4.y1 = y1; r4.x2 = x2; r4.y2 = Y1;
@@ -186,15 +189,8 @@ public:
 		r7.x1 = X1; r7.y1 = Y2; r7.x2 = X2; r7.y2 = y2;
 		r8.x1 = x1; r8.y1 = Y2; r8.x2 = X1; r8.y2 = y2;
 		r9.x1 = x1; r9.y1 = Y1; r9.x2 = X1; r9.y2 = Y2;
-		num.push_back(r1);// adding nine new rectangles to an array
-		num.push_back(r2);
-		num.push_back(r3);
-		num.push_back(r4);
-		num.push_back(r5);
-		num.push_back(r6);
-		num.push_back(r7);
-		num.push_back(r8);
-		num.push_back(r9);
+		for(size_t i = 0; i < 9; ++i)
+            num.push_back(r[i]);// adding nine new rectangles to an array
 		return num.size()-9;// returning new current rectangle number to make it chosen
 	}
 

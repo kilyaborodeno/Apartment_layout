@@ -84,6 +84,7 @@ void place_objects()
 {
     for(size_t i = 1; i < furniture.size(); ++i)
     {
+        cout << "Begin: " << i << endl;
         furniture[i].choose_rect(rects);
         furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
         int x1 = furniture[i].x;
@@ -91,8 +92,8 @@ void place_objects()
         int x2 = x1+furniture[i].width;
         int y2 = y1+furniture[i].length;
         furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
-		rects.num[furniture[i].current_rect].chosen = true;
-        rects.merge_all();
+        cout << "End: " << i << endl;
+        //rects.merge_all();
 		/*
 		for (int j = 0; j < rects.num.size(); ++j)
 			cout << rects.num[j] << endl;

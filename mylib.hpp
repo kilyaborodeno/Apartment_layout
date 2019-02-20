@@ -30,20 +30,20 @@ int sides_at_wall(int x1, int y1, int x2, int y2, int X1, int Y1, int X2, int Y2
         sides++; // right
     if(y2 == Y2)
         sides++; // lower
-    return sides;                   // side
+    return sides;         // side
 }
 
-int which_sides_free(int x1, int y1, int x2, int y2, int X1, int Y1, int X2, int Y2)
+int which_sides(int x1, int y1, int x2, int y2, int X1, int Y1, int X2, int Y2)
 {
 	cout << x1 << ' ' << y1 << ' ' << x2 << ' ' << y2 << ' ' << X1 << ' ' << Y1 << ' ' << X2 << ' ' << Y2 << endl;
     int sides = 0;
-    if(x1 != X1)
+    if(x1 == X1)
         sides = sides * 10 + 1; // left
-    if(y1 != Y1)
+    if(y1 == Y1)
         sides = sides * 10 + 2; // upper
-    if(x2 != X2)
+    if(x2 == X2)
         sides = sides * 10 + 3; // right
-    if(y2 != Y2)
+    if(y2 == Y2)
         sides = sides * 10 + 4; // lower
 	cout << sides << endl;
     return sides;                   // side
