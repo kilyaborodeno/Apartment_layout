@@ -57,7 +57,7 @@ void load()
 			file >> count;
 			file >> p.wall_x;
 			file >> p.wall_y;
-			cout << p << endl;
+			//cout << p << endl;
 			if (!furniture.size())
 			{
 				const int max_pixels = 1000;
@@ -70,7 +70,7 @@ void load()
 			else if ((p.length > furniture[0].length && p.length > furniture[0].width) ||
 				   	(p.width > furniture[0].width && p.width > furniture[0].length) ||
 				   	p.height > furniture[0].height)
-				cout << "??????? ??????? ???????" << endl;
+				cout << "Предмет слишком большой" << endl;
 			else
 				for (int i = 0; i < count; ++i)
 				{
@@ -84,21 +84,22 @@ void place_objects()
 {
     for(size_t i = 1; i < furniture.size(); ++i)
     {
-        cout << "Begin: " << i << endl;
         furniture[i].choose_rect(rects);
-        furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
+        if(furniture[i].current_rect == -1)
+		   continue;	
+		furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
         int x1 = furniture[i].x;
         int y1 = furniture[i].y;
         int x2 = x1+furniture[i].width;
         int y2 = y1+furniture[i].length;
         furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
-        cout << "End: " << i << endl;
-        //rects.merge_all();
+        rects.merge_all();
 		/*
-		for (int j = 0; j < rects.num.size(); ++j)
+		for (size_t j = 0; j < rects.num.size(); ++j)
 			cout << rects.num[j] << endl;
-			*/
+		*/
     }
+	cout << "\t" << rects.num.size();
 }
 
 void tick(int)
@@ -112,10 +113,24 @@ void onPaint()
 	rect_fill(0, 0, WIDTH, HEIGHT, hexcolor(255,255,255));
 	int i;
 	for(i = 1; i < furniture.size(); ++i)
-		rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
-                  furniture[i].x*SCALE+furniture[i].width*SCALE,
-				  furniture[i].y*SCALE+furniture[i].length*SCALE,
-				  furniture[i].color);
+		if (furniture[i].placed)
+			rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
+					  furniture[i].x*SCALE+furniture[i].width*SCALE,
+					  furniture[i].y*SCALE+furniture[i].length*SCALE,
+					  furniture[i].color);
+
+	for (int i = 0; i < rects.num.size(); ++i)
+	{
+		int x1 = rects.num[i].x1*SCALE;
+		int x2 = rects.num[i].x2*SCALE;
+		int y1 = rects.num[i].y1*SCALE;
+		int y2 = rects.num[i].y2*SCALE;
+
+		line(x1, y1, x1, y2);
+		line(x2, y1, x2, y2);
+		line(x1, y1, x2, y1);
+		line(x1, y2, x2, y2);
+	}
 	glutSwapBuffers();
 }
 

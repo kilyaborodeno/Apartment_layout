@@ -19,8 +19,7 @@ struct Rect
 
 	bool fits(int width, int length)
 	{
-		if((x2 - x1 < width)||(y2 - y1 < width)) // also checking if the object can be rotated and fit in rectangle
-            if((x2 - x1 < length)||(y2 - y1 < length))
+		if(((x2 - x1 >= width) && (y2 - y1 >= length)) || ((x2 - x1 >= length) && (y2 - y1 >= width)))
                 return true;
 		return false;
 	}
@@ -28,11 +27,11 @@ struct Rect
 
 ostream& operator<<(ostream& out, const Rect r)
 {
-	out << "x1: " << r.x1 << endl;
-	out << "y1: " << r.y1 << endl;
-	out << "x2: " << r.x2 << endl;
-	out << "y2: " << r.y2 << endl;
-	out << "chosen: " << std::string(r.chosen ? "true" : "false") << endl;
+	out << "\t" << "x1: " << r.x1 << endl;
+	out << "\t" << "y1: " << r.y1 << endl;
+	out << "\t" << "x2: " << r.x2 << endl;
+	out << "\t" << "y2: " << r.y2 << endl;
+	out << "\t" << "chosen: " << std::string(r.chosen ? "true" : "false") << endl;
 	return out;
 }
 
@@ -83,18 +82,16 @@ public:
         int x2 = num[number].x2;
         int y2 = num[number].y2;
 
-///////////
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 4)
 			return number;
 
 		int s = which_sides(x1, y1, x2, y2, X1, Y1, X2, Y2);
-		if(num.size() != 1) num.erase(num.begin() + number);// deleting a sliced rectangle from an array
+		num.erase(num.begin() + number);// deleting a sliced rectangle from an array
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 3)
 		{
 			Rect r[2];
 			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of two new rectangles
-            r[1].chosen = false;
 			switch(s)
 			{
 				case 123: r[1].x1 = x1; r[1].y1 = Y2; r[1].x2 = x2; r[1].y2 = y2; break;
@@ -106,13 +103,11 @@ public:
                 num.push_back(r[i]);
 			return num.size()-2;    // returning new current rectangle number to make it chosen
 		}
-///////////
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 2)
 		{
 			Rect r[4];
 			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of four new rectangles
-			for(size_t i = 1; i < 4; ++i) r[i].chosen = false;
 			switch(s)
 			{
 				case 12: r[1].x1 = x1; r[1].y1 = Y2; r[1].x2 = X2; r[1].y2 = y2;
@@ -133,62 +128,57 @@ public:
 				break;
 			}
 			for(size_t i = 0; i < 4; ++i)// adding four new rectangles to an array
-            {
                 num.push_back(r[i]);
-            }
 			return num.size()-4;// returning new current rectangle number to make a it chosen
 		}
-///////////
 
 		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 1)
 		{
-			Rect r1, r2, r3, r4, r5, r6;
-			r1.x1 = X1; r1.y1 = Y1; r1.x2 = X2; r1.y2 = Y2; r[0].chosen = true; // Calculating the coordinates of six new rectangles
-			for(size_t i = 1; i < 6; ++i) r[i].chosen = false;
+			Rect r[6];
+			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of six new rectangles
 			switch(s)
 			{
-				case 234: r2.x1 = x1; r2.y1 = y1; r2.x2 = X2; r2.y2 = Y1;
-						  r3.x1 = X2; r3.y1 = y1; r3.x2 = x2; r3.y2 = Y1;
-						  r4.x1 = X2; r4.y1 = Y1; r4.x2 = x2; r4.y2 = Y2;
-						  r5.x1 = X2; r5.y1 = Y2; r5.x2 = x2; r5.y2 = y2;
-						  r6.x1 = x1; r6.y1 = Y2; r6.x2 = X2; r6.y2 = y1;
+				case 1: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X2; r[1].y2 = Y1;
+						r[2].x1 = X2; r[2].y1 = y1; r[2].x2 = x2; r[2].y2 = Y1;
+						r[3].x1 = X2; r[3].y1 = Y1; r[3].x2 = x2; r[3].y2 = Y2;
+						r[4].x1 = X2; r[4].y1 = Y2; r[4].x2 = x2; r[4].y2 = y2;
+						r[5].x1 = x1; r[5].y1 = Y2; r[5].x2 = X2; r[5].y2 = y2;
 				break;
-				case 134: r2.x1 = x1; r2.y1 = y1; r2.x2 = X1; r2.y2 = Y2;
-						  r3.x1 = x1; r3.y1 = Y2; r3.x2 = X1; r3.y2 = y2;
-						  r4.x1 = X1; r4.y1 = Y2; r4.x2 = X2; r4.y2 = y2;
-						  r5.x1 = X2; r5.y1 = Y2; r5.x2 = x2; r5.y2 = y2;
-						  r6.x1 = X2; r6.y1 = y1; r6.x2 = x2; r6.y2 = Y2;
+				case 2: r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X1; r[1].y2 = Y2;
+						r[2].x1 = x1; r[2].y1 = Y2; r[2].x2 = X1; r[2].y2 = y2;
+						r[3].x1 = X1; r[3].y1 = Y2; r[3].x2 = X2; r[3].y2 = y2;
+						r[4].x1 = X2; r[4].y1 = Y2; r[4].x2 = x2; r[4].y2 = y2;
+						r[5].x1 = X2; r[5].y1 = y1; r[5].x2 = x2; r[5].y2 = Y2;
 				break;
-				case 124: r2.x1 = X1; r2.y1 = y1; r2.x2 = x2; r2.y2 = Y1;
-						  r3.x1 = x1; r3.y1 = y1; r3.x2 = X1; r3.y2 = Y1;
-						  r4.x1 = x1; r4.y1 = Y1; r4.x2 = X1; r4.y2 = Y2;
-						  r5.x1 = x1; r5.y1 = Y2; r5.x2 = X1; r5.y2 = y2;
-						  r6.x1 = X1; r6.y1 = Y2; r6.x2 = x2; r6.y2 = y2;
+				case 3: r[1].x1 = X1; r[1].y1 = y1; r[1].x2 = x2; r[1].y2 = Y1;
+						r[2].x1 = x1; r[2].y1 = y1; r[2].x2 = X1; r[2].y2 = Y1;
+						r[3].x1 = x1; r[3].y1 = Y1; r[3].x2 = X1; r[3].y2 = Y2;
+						r[4].x1 = x1; r[4].y1 = Y2; r[4].x2 = X1; r[4].y2 = y2;
+						r[5].x1 = X1; r[5].y1 = Y2; r[5].x2 = x2; r[5].y2 = y2;
 				break;
-				case 123: r2.x1 = x1; r2.y1 = Y1; r2.x2 = X1; r2.y2 = y2;
-						  r3.x1 = x1; r3.y1 = y1; r3.x2 = X1; r3.y2 = Y1;
-						  r4.x1 = X1; r4.y1 = y1; r4.x2 = X2; r4.y2 = Y1;
-						  r5.x1 = X2; r5.y1 = y1; r5.x2 = x2; r5.y2 = Y1;
-						  r6.x1 = X2; r6.y1 = Y1; r6.x2 = x2; r6.y2 = y2;
+				case 4: r[1].x1 = x1; r[1].y1 = Y1; r[1].x2 = X1; r[1].y2 = y2;
+						r[2].x1 = x1; r[2].y1 = y1; r[2].x2 = X1; r[2].y2 = Y1;
+						r[3].x1 = X1; r[3].y1 = y1; r[3].x2 = X2; r[3].y2 = Y1;
+						r[4].x1 = X2; r[4].y1 = y1; r[4].x2 = x2; r[4].y2 = Y1;
+						r[5].x1 = X2; r[5].y1 = Y1; r[5].x2 = x1; r[5].y2 = y1;
 				break;
 			}
-			for(suze_t i = 0; i < 6 ++i) // adding six new rectangles to an array
+			for(size_t i = 0; i < 6; ++i) // adding six new rectangles to an array
                 num.push_back(r[i]);
 			return num.size()-6;// returning new current rectangle number to make it chosen
 		}
 
 		// sides_at_wall == 0
-		Rect r1, r2, r3, r4, r5, r6, r7, r8, r9;
-        for(size_t i = 1; i < 9; ++i) r[i].chosen = false;
+		Rect r[9];
 		r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of nine new rectangles
-		r2.x1 = x1; r2.y1 = y1; r2.x2 = X1; r2.y2 = Y1;
-		r3.x1 = X1; r3.y1 = y1; r3.x2 = X2; r3.y2 = Y1;
-		r4.x1 = X2; r4.y1 = y1; r4.x2 = x2; r4.y2 = Y1;
-		r5.x1 = X2; r5.y1 = Y1; r5.x2 = x2; r5.y2 = Y2;
-		r6.x1 = X2; r6.y1 = Y2; r6.x2 = x2; r6.y2 = y2;
-		r7.x1 = X1; r7.y1 = Y2; r7.x2 = X2; r7.y2 = y2;
-		r8.x1 = x1; r8.y1 = Y2; r8.x2 = X1; r8.y2 = y2;
-		r9.x1 = x1; r9.y1 = Y1; r9.x2 = X1; r9.y2 = Y2;
+		r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X1; r[1].y2 = Y1;
+		r[2].x1 = X1; r[2].y1 = y1; r[2].x2 = X2; r[2].y2 = Y1;
+		r[3].x1 = X2; r[3].y1 = y1; r[3].x2 = x2; r[3].y2 = Y1;
+		r[4].x1 = X2; r[4].y1 = Y1; r[4].x2 = x2; r[4].y2 = Y2;
+		r[5].x1 = X2; r[5].y1 = Y2; r[5].x2 = x2; r[5].y2 = y2;
+		r[6].x1 = X1; r[6].y1 = Y2; r[6].x2 = X2; r[6].y2 = y2;
+		r[7].x1 = x1; r[7].y1 = Y2; r[7].x2 = X1; r[7].y2 = y2;
+		r[8].x1 = x1; r[8].y1 = Y1; r[8].x2 = X1; r[8].y2 = Y2;
 		for(size_t i = 0; i < 9; ++i)
             num.push_back(r[i]);// adding nine new rectangles to an array
 		return num.size()-9;// returning new current rectangle number to make it chosen
@@ -197,35 +187,35 @@ public:
 	bool merge()
 	{
 	    bool found = false;
-        for(size_t i = 0; i < num.size(); ++i)
+        for(size_t i = 1; i < num.size(); ++i)
         {
             if(!num[i].chosen)
             {
-                for(size_t k = 0; k < num.size(); ++k) // Searching for rectangles near rectangle number i
+                for(size_t k = 1; k < num.size(); ++k) // Searching for rectangles near rectangle number i
                 {
-                    if(i == k)
+                    if(i == k || num[k].chosen)
                         continue;
-                    if(((num[i].x1 == num[k].x1 && num[i].y1 == num[k].y1)&& // if left side is the same, merge two rectangles
-                    (num[i].x1 == num[k].x1 && num[i].y2 == num[k].y2))||
-                    ((num[i].x1 == num[k].x1 && num[i].y1 == num[k].y1)&& // if upper side is the same, merge two rectangles
-                    (num[i].x2 == num[k].x2 && num[i].y1 == num[k].y1)))
+                    if(((num[i].x1 == num[k].x2 && num[i].y1 == num[k].y1)&& // if left side is the same, merge two rectangles
+                    (num[i].x1 == num[k].x2 && num[i].y2 == num[k].y2))||
+                    ((num[i].x1 == num[k].x1 && num[i].y1 == num[k].y2)&& // if upper side is the same, merge two rectangles
+                    (num[i].x2 == num[k].x2 && num[i].y1 == num[k].y2)))
                     {
                         Rect n; // new
                         n.x1 = num[k].x1;
                         n.y1 = num[k].y1;
                         n.x2 = num[i].x2;
                         n.y2 = num[i].y2;
-                        if(i) num.erase(num.begin() + i);
+                        num.erase(num.begin() + i);
 						if(k > i) k--;
-                        if(k) num.erase(num.begin() + k);
+                        num.erase(num.begin() + k);
                         num.push_back(n);
                         found = true;
                         break;
                     }
-                    if (((num[i].x2 == num[k].x2 && num[i].y1 == num[k].y1)&& // if right side is the same, merge two rectangles
-                    (num[i].x2 == num[k].x2 && num[i].y2 == num[k].y2))||
-                    ((num[i].x1 == num[k].x1 && num[i].y2 == num[k].y2)&& // if lower side is the same, merge two rectangles
-                    (num[i].x2 == num[k].x2 && num[i].y2 == num[k].y2)))
+                    if(((num[i].x2 == num[k].x1 && num[i].y1 == num[k].y1)&& // if right side is the same, merge two rectangles
+                    (num[i].x2 == num[k].x1 && num[i].y2 == num[k].y2))||
+                    ((num[i].x1 == num[k].x1 && num[i].y2 == num[k].y1)&& // if lower side is the same, merge two rectangles
+                    (num[i].x2 == num[k].x2 && num[i].y2 == num[k].y1)))
                     {
                         Rect n; // new
                         n.x1 = num[i].x1;
@@ -240,13 +230,11 @@ public:
                         break;
                     }
                 }
-                if(found)
-                    break;
             }
+			if(found)
+				break;
         }
-        if(found)
-            return true;
-        return false;
+		return found;
 	}
 
 	void merge_all()

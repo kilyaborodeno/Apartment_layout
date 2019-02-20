@@ -6,3 +6,8 @@ run: all
 
 debug: all
 	gdb ./a.out
+
+commit:
+	git add --a
+	git commit
+	git push origin master
