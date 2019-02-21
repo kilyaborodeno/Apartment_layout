@@ -86,7 +86,7 @@ void place_objects()
     {
         furniture[i].choose_rect(rects);
         if(furniture[i].current_rect == -1)
-		   continue;	
+		   continue;
 		furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
         int x1 = furniture[i].x;
         int y1 = furniture[i].y;
@@ -99,7 +99,7 @@ void place_objects()
 			cout << rects.num[j] << endl;
 		*/
     }
-	cout << "\t" << rects.num.size();
+//  cout << "\t" << rects.num.size();
 }
 
 void tick(int)
@@ -111,15 +111,14 @@ void onPaint()
 {
     clear(0,0,0);
 	rect_fill(0, 0, WIDTH, HEIGHT, hexcolor(255,255,255));
-	int i;
-	for(i = 1; i < furniture.size(); ++i)
+	for(size_t i = 1; i < furniture.size(); ++i)
 		if (furniture[i].placed)
 			rect_fill(furniture[i].x*SCALE, furniture[i].y*SCALE,
 					  furniture[i].x*SCALE+furniture[i].width*SCALE,
 					  furniture[i].y*SCALE+furniture[i].length*SCALE,
 					  furniture[i].color);
 
-	for (int i = 0; i < rects.num.size(); ++i)
+	for(size_t i = 0; i < rects.num.size(); ++i)
 	{
 		int x1 = rects.num[i].x1*SCALE;
 		int x2 = rects.num[i].x2*SCALE;

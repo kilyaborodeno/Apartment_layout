@@ -27,11 +27,11 @@ struct Rect
 
 ostream& operator<<(ostream& out, const Rect r)
 {
-	out << "\t" << "x1: " << r.x1 << endl;
-	out << "\t" << "y1: " << r.y1 << endl;
-	out << "\t" << "x2: " << r.x2 << endl;
-	out << "\t" << "y2: " << r.y2 << endl;
-	out << "\t" << "chosen: " << std::string(r.chosen ? "true" : "false") << endl;
+	out << "\tx1: " << r.x1 << endl;
+	out << "\ty1: " << r.y1 << endl;
+	out << "\tx2: " << r.x2 << endl;
+	out << "\ty2: " << r.y2 << endl;
+	out << "\tchosen: " << std::string(r.chosen ? "true" : "false") << endl;
 	return out;
 }
 
@@ -82,13 +82,15 @@ public:
         int x2 = num[number].x2;
         int y2 = num[number].y2;
 
-		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 4)
+        int sides = sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2);
+
+		if(sides == 4)
 			return number;
 
 		int s = which_sides(x1, y1, x2, y2, X1, Y1, X2, Y2);
 		num.erase(num.begin() + number);// deleting a sliced rectangle from an array
 
-		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 3)
+		if(sides == 3)
 		{
 			Rect r[2];
 			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of two new rectangles
@@ -104,7 +106,7 @@ public:
 			return num.size()-2;    // returning new current rectangle number to make it chosen
 		}
 
-		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 2)
+		if(sides == 2)
 		{
 			Rect r[4];
 			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of four new rectangles
@@ -132,7 +134,7 @@ public:
 			return num.size()-4;// returning new current rectangle number to make a it chosen
 		}
 
-		if(sides_at_wall(x1, y1, x2, y2, X1, Y1, X2, Y2) == 1)
+		if(sides == 1)
 		{
 			Rect r[6];
 			r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of six new rectangles
@@ -168,7 +170,7 @@ public:
 			return num.size()-6;// returning new current rectangle number to make it chosen
 		}
 
-		// sides_at_wall == 0
+		// sides == 0
 		Rect r[9];
 		r[0].x1 = X1; r[0].y1 = Y1; r[0].x2 = X2; r[0].y2 = Y2; r[0].chosen = true; // Calculating the coordinates of nine new rectangles
 		r[1].x1 = x1; r[1].y1 = y1; r[1].x2 = X1; r[1].y2 = Y1;
@@ -200,34 +202,14 @@ public:
                     ((num[i].x1 == num[k].x1 && num[i].y1 == num[k].y2)&& // if upper side is the same, merge two rectangles
                     (num[i].x2 == num[k].x2 && num[i].y1 == num[k].y2)))
                     {
-                        Rect n; // new
-                        n.x1 = num[k].x1;
-                        n.y1 = num[k].y1;
-                        n.x2 = num[i].x2;
-                        n.y2 = num[i].y2;
-                        num.erase(num.begin() + i);
-						if(k > i) k--;
-                        num.erase(num.begin() + k);
-                        num.push_back(n);
-                        found = true;
-                        break;
+						unite(i, k, 1);
                     }
                     if(((num[i].x2 == num[k].x1 && num[i].y1 == num[k].y1)&& // if right side is the same, merge two rectangles
                     (num[i].x2 == num[k].x1 && num[i].y2 == num[k].y2))||
                     ((num[i].x1 == num[k].x1 && num[i].y2 == num[k].y1)&& // if lower side is the same, merge two rectangles
                     (num[i].x2 == num[k].x2 && num[i].y2 == num[k].y1)))
                     {
-                        Rect n; // new
-                        n.x1 = num[i].x1;
-                        n.y1 = num[i].y1;
-                        n.x2 = num[k].x2;
-                        n.y2 = num[k].y2;
-                        if(i) num.erase(num.begin() + i);
-						if(k > i) k--;
-                        if(k) num.erase(num.begin() + k);
-                        num.push_back(n);
-                        found = true;
-                        break;
+                        unite(i, k, 2)
                     }
                 }
             }
@@ -245,6 +227,32 @@ public:
             goes = merge();
         }while(goes);
 	}
+private:
+    void unite(int i, int k, int case)
+    {
+        if(case == 1)
+        {
+            Rect n; // new
+            n.x1 = num[k].x1;
+            n.y1 = num[k].y1;
+            n.x2 = num[i].x2;
+            n.y2 = num[i].y2;
+        }
+        if(case == 2)
+        {
+            Rect n; // new
+            n.x1 = num[i].x1;
+            n.y1 = num[i].y1;
+            n.x2 = num[k].x2;
+            n.y2 = num[k].y2;
+        }
+        num.erase(num.begin() + i);
+        if(k > i) k--;
+        num.erase(num.begin() + k);
+        num.push_back(n);
+        found = true;
+        break;
+    }
 
 };
 
