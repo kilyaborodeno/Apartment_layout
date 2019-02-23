@@ -202,14 +202,14 @@ public:
                     ((num[i].x1 == num[k].x1 && num[i].y1 == num[k].y2)&& // if upper side is the same, merge two rectangles
                     (num[i].x2 == num[k].x2 && num[i].y1 == num[k].y2)))
                     {
-						unite(i, k, 1);
+						found = unite(i, k, 1);
                     }
                     if(((num[i].x2 == num[k].x1 && num[i].y1 == num[k].y1)&& // if right side is the same, merge two rectangles
                     (num[i].x2 == num[k].x1 && num[i].y2 == num[k].y2))||
                     ((num[i].x1 == num[k].x1 && num[i].y2 == num[k].y1)&& // if lower side is the same, merge two rectangles
                     (num[i].x2 == num[k].x2 && num[i].y2 == num[k].y1)))
                     {
-                        unite(i, k, 2)
+                        found = unite(i, k, 0);
                     }
                 }
             }
@@ -228,19 +228,18 @@ public:
         }while(goes);
 	}
 private:
-    void unite(int i, int k, int case)
+    bool unite(int i, int k, bool left)
     {
-        if(case == 1)
+		Rect n; // new
+        if(left)
         {
-            Rect n; // new
             n.x1 = num[k].x1;
             n.y1 = num[k].y1;
             n.x2 = num[i].x2;
             n.y2 = num[i].y2;
         }
-        if(case == 2)
+		else
         {
-            Rect n; // new
             n.x1 = num[i].x1;
             n.y1 = num[i].y1;
             n.x2 = num[k].x2;
@@ -250,8 +249,7 @@ private:
         if(k > i) k--;
         num.erase(num.begin() + k);
         num.push_back(n);
-        found = true;
-        break;
+        return true;
     }
 
 };
