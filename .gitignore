@@ -2,3 +2,6 @@
 *.exe
 Session.vim
 test.cpp
+Startify
+.gitignore
+1.cpp

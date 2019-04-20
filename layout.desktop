@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Value=1.0
+Type=Application
+Name=Bomb dispoder
+GenericName=Apartment layout
+Comment=Layout generating programm
+Icon=/home/jastice/git/Apartment_layout/Layout_icon.png
+Exec="/home/jastice/git/Apartment_layout/a.out" ""
+Categories=App;
+Path=/home/jastice/git/Apartment_layout/
+Name[ru_RU]=Программа для генерации планировки квартиры

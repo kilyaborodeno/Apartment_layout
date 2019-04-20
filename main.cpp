@@ -1,7 +1,11 @@
+// Copyright © 2018 - 2019 by Ilya Borodenok <kilyaborodeno@gmail.com>
+// and Ivanov Dmitry <hant0508@gmail.com>
 #include <iostream>      // cin, cout, ...
 #include <fstream>       // ifstream, ostream
+#include <cassert>      
 #include "mycanvas.hpp"  // graphics
 #include "Piece.hpp"     // room objects
+#include "Rects.hpp"     // slicing of free space
 #include "mylib.hpp"     // Some special functions
 #include <ctime>         // time
 #include <vector>        // vector
@@ -87,18 +91,20 @@ void place_objects()
         furniture[i].choose_rect(rects);
         if(furniture[i].current_rect == -1)
 		   continue;
+Rect &r = rects.num.at(furniture[i].current_rect);
+assert(r.x1 < 1000 && r.x1 >= 0 && r.y1 < 1000 && r.x2 < 1000 && r.y2 < 1000 && r.x2 >= 0 && r.y1 >= 0 && r.y2 >= 0);
 		furniture[i].gen_coords(rects.num[furniture[i].current_rect]); // Generate coordinates in chosen rectangle
         int x1 = furniture[i].x;
         int y1 = furniture[i].y;
         int x2 = x1+furniture[i].width;
         int y2 = y1+furniture[i].length;
+assert(r.x1 < 1000 && r.x1 >= 0 && r.y1 < 1000 && r.x2 < 1000 && r.y2 < 1000 && r.x2 >= 0 && r.y1 >= 0 && r.y2 >= 0);
         furniture[i].current_rect = rects.slice(x1, y1, x2, y2, furniture[i].current_rect);
         rects.merge_all();
-		/*
+    }
 		for (size_t j = 0; j < rects.num.size(); ++j)
 			cout << rects.num[j] << endl;
-		*/
-    }
+
 //  cout << "\t" << rects.num.size();
 }
 
